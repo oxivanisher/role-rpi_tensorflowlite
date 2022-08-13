@@ -39,9 +39,9 @@
     mode: 0750
 
 - name: download model and extract
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ tenserflow_lite_model_url }}"
     dest: "{{ tenserflow_lite_model_dir }}"
     creates: "{{ tenserflow_lite_model_dir }}/detect.tflite"
-    remote_src: yes
+    remote_src: true
   ignore_errors: "{{ ansible_check_mode }}"
