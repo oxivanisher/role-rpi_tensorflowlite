@@ -1,5 +1,4 @@
 ---
-
 tenserflow_lite_user: pi
 tenserflow_lite_dir: "/home/{{ tenserflow_lite_user }}/tensorflow/tensorflow_src"
 tenserflow_lite_version: v2.1.1

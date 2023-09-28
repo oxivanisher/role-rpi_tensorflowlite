@@ -1,20 +1,19 @@
 ---
-
 # based on https://www.tensorflow.org/lite/guide/build_rpi
 
-- name: ensure build-essential
+- name: Ensure build-essential
   ansible.builtin.package:
     name: build-essential
     state: present
 
-- name: ensure git repository
+- name: Ensure git repository
   ansible.builtin.git:
-    repo: 'https://github.com/tensorflow/tensorflow.git'
+    repo: "https://github.com/tensorflow/tensorflow.git"
     dest: "{{ tenserflow_lite_dir }}"
     version: "{{ tenserflow_lite_version }}"
   register: git_state
 
-- name: download TenserFlow Lite dependencies
+- name: Download TenserFlow Lite dependencies
   ansible.builtin.command: "{{ tenserflow_lite_dir }}/tensorflow/lite/tools/make/download_dependencies.sh"
   args:
     chdir: "{{ tenserflow_lite_dir }}"
@@ -22,7 +21,7 @@
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
 
-- name: compile TenserFlow Lite
+- name: Compile TenserFlow Lite
   ansible.builtin.command: "{{ tenserflow_lite_dir }}/tensorflow/lite/tools/make/build_rpi_lib.sh"
   args:
     chdir: "{{ tenserflow_lite_dir }}"
@@ -30,15 +29,15 @@
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
 
-- name: ensure model directory exists
+- name: Ensure model directory exists
   ansible.builtin.file:
     path: "{{ tenserflow_lite_model_dir }}"
     state: directory
     owner: "{{ tenserflow_lite_user }}"
     group: "{{ tenserflow_lite_user }}"
-    mode: 0750
+    mode: "0750"
 
-- name: download model and extract
+- name: Download model and extract
   ansible.builtin.unarchive:
     src: "{{ tenserflow_lite_model_url }}"
     dest: "{{ tenserflow_lite_model_dir }}"
