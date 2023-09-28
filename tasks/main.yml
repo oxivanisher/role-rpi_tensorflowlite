@@ -18,16 +18,20 @@
   args:
     chdir: "{{ tenserflow_lite_dir }}"
   become_user: "{{ tenserflow_lite_user }}"
+  become: true
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
+  changed_when: true
 
 - name: Compile TenserFlow Lite
   ansible.builtin.command: "{{ tenserflow_lite_dir }}/tensorflow/lite/tools/make/build_rpi_lib.sh"
   args:
     chdir: "{{ tenserflow_lite_dir }}"
   become_user: "{{ tenserflow_lite_user }}"
+  become: true
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
+  changed_when: true
 
 - name: Ensure model directory exists
   ansible.builtin.file:
