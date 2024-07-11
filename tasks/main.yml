@@ -11,6 +11,8 @@
     repo: "https://github.com/tensorflow/tensorflow.git"
     dest: "{{ tenserflow_lite_dir }}"
     version: "{{ tenserflow_lite_version }}"
+  become_user: "{{ tenserflow_lite_user }}"
+  become: true
   register: git_state
 
 - name: Download TenserFlow Lite dependencies
