@@ -9,27 +9,27 @@
 - name: Ensure git repository
   ansible.builtin.git:
     repo: "https://github.com/tensorflow/tensorflow.git"
-    dest: "{{ tenserflow_lite_dir }}"
-    version: "{{ tenserflow_lite_version }}"
-  become_user: "{{ tenserflow_lite_user }}"
+    dest: "{{ tenserflowlite_dir }}"
+    version: "{{ tenserflowlite_version }}"
+  become_user: "{{ tenserflowlite_user }}"
   become: true
   register: git_state
 
 - name: Download TenserFlow Lite dependencies
-  ansible.builtin.command: "{{ tenserflow_lite_dir }}/tensorflow/lite/tools/make/download_dependencies.sh"
+  ansible.builtin.command: "{{ tenserflowlite_dir }}/tensorflow/lite/tools/make/download_dependencies.sh"
   args:
-    chdir: "{{ tenserflow_lite_dir }}"
-  become_user: "{{ tenserflow_lite_user }}"
+    chdir: "{{ tenserflowlite_dir }}"
+  become_user: "{{ tenserflowlite_user }}"
   become: true
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
   changed_when: true
 
 - name: Compile TenserFlow Lite
-  ansible.builtin.command: "{{ tenserflow_lite_dir }}/tensorflow/lite/tools/make/build_rpi_lib.sh"
+  ansible.builtin.command: "{{ tenserflowlite_dir }}/tensorflow/lite/tools/make/build_rpi_lib.sh"
   args:
-    chdir: "{{ tenserflow_lite_dir }}"
-  become_user: "{{ tenserflow_lite_user }}"
+    chdir: "{{ tenserflowlite_dir }}"
+  become_user: "{{ tenserflowlite_user }}"
   become: true
   ignore_errors: "{{ ansible_check_mode }}"
   when: git_state.after != git_state.before
@@ -37,16 +37,18 @@
 
 - name: Ensure model directory exists
   ansible.builtin.file:
-    path: "{{ tenserflow_lite_model_dir }}"
+    path: "{{ tenserflowlite_model_dir }}"
     state: directory
-    owner: "{{ tenserflow_lite_user }}"
-    group: "{{ tenserflow_lite_user }}"
+    owner: "{{ tenserflowlite_user }}"
+    group: "{{ tenserflowlite_user }}"
     mode: "0750"
 
 - name: Download model and extract
   ansible.builtin.unarchive:
-    src: "{{ tenserflow_lite_model_url }}"
-    dest: "{{ tenserflow_lite_model_dir }}"
-    creates: "{{ tenserflow_lite_model_dir }}/detect.tflite"
+    src: "{{ tenserflowlite_model_url }}"
+    dest: "{{ tenserflowlite_model_dir }}"
+    creates: "{{ tenserflowlite_model_dir }}/detect.tflite"
     remote_src: true
+  become_user: "{{ tenserflowlite_user }}"
+  become: true
   ignore_errors: "{{ ansible_check_mode }}"
