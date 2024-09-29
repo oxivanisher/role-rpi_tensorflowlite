@@ -12,7 +12,7 @@
       - wget
       - unzip
     state: present
-  become_user: "{{ tenserflowlite_user }}"
+  become_user: root
   become: true
 
 - name: Ensure TensorFlow repository
