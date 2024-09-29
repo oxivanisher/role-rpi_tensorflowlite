@@ -1,39 +1,44 @@
 ---
-# based on https://www.tensorflow.org/lite/guide/build_rpi
+# Based on https://www.tensorflow.org/lite/guide/build_rpi with updated sources
 
-- name: Ensure build-essential
+- name: Ensure build-essential and dependencies
   ansible.builtin.package:
-    name: build-essential
+    name:
+      - build-essential
+      - cmake
+      - libatlas-base-dev
+      - python3-dev
+      - python3-pip
+      - wget
+      - unzip
     state: present
 
-- name: Ensure git repository
+- name: Ensure TensorFlow repository
   ansible.builtin.git:
     repo: "https://github.com/tensorflow/tensorflow.git"
     dest: "{{ tenserflowlite_dir }}"
-    version: "{{ tenserflowlite_version }}"
+    version: "{{ tenserflowlite_version | default('master') }}"
   become_user: "{{ tenserflowlite_user }}"
   become: true
   register: git_state
 
-- name: Download TenserFlow Lite dependencies
-  ansible.builtin.command: "{{ tenserflowlite_dir }}/tensorflow/lite/tools/make/download_dependencies.sh"
+- name: Download TensorFlow Lite dependencies
+  ansible.builtin.command: "./tensorflow/lite/tools/make/download_dependencies.sh"
   args:
     chdir: "{{ tenserflowlite_dir }}"
   become_user: "{{ tenserflowlite_user }}"
   become: true
-  ignore_errors: "{{ ansible_check_mode }}"
-  when: git_state.after != git_state.before
   changed_when: true
+  when: git_state.after != git_state.before
 
-- name: Compile TenserFlow Lite
-  ansible.builtin.command: "{{ tenserflowlite_dir }}/tensorflow/lite/tools/make/build_rpi_lib.sh"
+- name: Compile TensorFlow Lite
+  ansible.builtin.command: "./tensorflow/lite/tools/make/build_rpi_lib.sh"
   args:
     chdir: "{{ tenserflowlite_dir }}"
   become_user: "{{ tenserflowlite_user }}"
   become: true
-  ignore_errors: "{{ ansible_check_mode }}"
-  when: git_state.after != git_state.before
   changed_when: true
+  when: git_state.after != git_state.before
 
 - name: Ensure model directory exists
   ansible.builtin.file:
@@ -43,12 +48,27 @@
     group: "{{ tenserflowlite_user }}"
     mode: "0750"
 
-- name: Download model and extract
-  ansible.builtin.unarchive:
-    src: "{{ tenserflowlite_model_url }}"
-    dest: "{{ tenserflowlite_model_dir }}"
-    creates: "{{ tenserflowlite_model_dir }}/detect.tflite"
-    remote_src: true
+# Check if the model has already been downloaded and extracted
+- name: Check if model is already extracted
+  ansible.builtin.stat:
+    path: "{{ tenserflowlite_model_dir }}/detect.tflite"
+  register: model_exists
+
+- name: Download pre-trained model (SSD MobileNet v2) if not already downloaded
+  ansible.builtin.get_url:
+    url: "https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip"
+    dest: "{{ tenserflowlite_model_dir }}/model.zip"
+    mode: "0644"
   become_user: "{{ tenserflowlite_user }}"
   become: true
-  ignore_errors: "{{ ansible_check_mode }}"
+  when: not model_exists.stat.exists
+
+- name: Extract pre-trained model if not already extracted
+  ansible.builtin.unarchive:
+    src: "{{ tenserflowlite_model_dir }}/model.zip"
+    dest: "{{ tenserflowlite_model_dir }}"
+    remote_src: true
+    creates: "{{ tenserflowlite_model_dir }}/detect.tflite"
+  become_user: "{{ tenserflowlite_user }}"
+  become: true
+  when: not model_exists.stat.exists
