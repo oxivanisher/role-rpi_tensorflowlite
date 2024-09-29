@@ -1,6 +1,6 @@
 ---
-tenserflowlite_user: pi
-tenserflowlite_dir: "/home/{{ tenserflowlite_user }}/tensorflow/tensorflow_src"
-tenserflowlite_version: master
-tenserflowlite_model_url: https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
-tenserflowlite_model_dir: "/home/{{ tenserflowlite_user }}/tensorflow/model"
+tensorflowlite_user: pi
+tensorflowlite_dir: "/home/{{ tensorflowlite_user }}/tensorflow/tensorflow_src"
+tensorflowlite_version: master
+tensorflowlite_model_url: https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
+tensorflowlite_model_dir: "/home/{{ tensorflowlite_user }}/tensorflow/model"
