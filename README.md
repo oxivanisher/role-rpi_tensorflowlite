@@ -1,5 +1,6 @@
 rpi_tensorflowlite
 ==================
+[![Ansible Lint](https://github.com/oxivanisher/role-rpi_tensorflowlite/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/oxivanisher/role-rpi_tensorflowlite/actions/workflows/ansible-lint.yml)
 
 This role installs tensorflow lite on a Rasperry Pi.
 
