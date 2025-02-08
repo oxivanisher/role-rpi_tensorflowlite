@@ -57,6 +57,8 @@
 - name: Check if model is already extracted
   ansible.builtin.stat:
     path: "{{ rpi_tensorflowlite_model_dir }}/detect.tflite"
+  become_user: "{{ rpi_tensorflowlite_user }}"
+  become: true
   register: model_exists
 
 - name: Download pre-trained model (SSD MobileNet v2) if not already downloaded
