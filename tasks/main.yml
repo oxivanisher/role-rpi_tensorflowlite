@@ -18,18 +18,18 @@
 - name: Ensure TensorFlow repository
   ansible.builtin.git:
     repo: "https://github.com/tensorflow/tensorflow.git"
-    dest: "{{ tensorflowlite_dir }}"
-    version: "{{ tensorflowlite_version | default('master') }}"
+    dest: "{{ rpi_tensorflowlite_dir }}"
+    version: "{{ rpi_tensorflowlite_version | default('master') }}"
     depth: 1
-  become_user: "{{ tensorflowlite_user }}"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   register: git_state
 
 - name: Download TensorFlow Lite dependencies
   ansible.builtin.command: "./tensorflow/lite/tools/make/download_dependencies.sh"
   args:
-    chdir: "{{ tensorflowlite_dir }}"
-  become_user: "{{ tensorflowlite_user }}"
+    chdir: "{{ rpi_tensorflowlite_dir }}"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   changed_when: true
   when: git_state.after != git_state.before
@@ -37,43 +37,43 @@
 - name: Compile TensorFlow Lite
   ansible.builtin.command: "./tensorflow/lite/tools/make/build_rpi_lib.sh"
   args:
-    chdir: "{{ tensorflowlite_dir }}"
-  become_user: "{{ tensorflowlite_user }}"
+    chdir: "{{ rpi_tensorflowlite_dir }}"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   changed_when: true
   when: git_state.after != git_state.before
 
 - name: Ensure model directory exists
   ansible.builtin.file:
-    path: "{{ tensorflowlite_model_dir }}"
+    path: "{{ rpi_tensorflowlite_model_dir }}"
     state: directory
-    owner: "{{ tensorflowlite_user }}"
-    group: "{{ tensorflowlite_user }}"
+    owner: "{{ rpi_tensorflowlite_user }}"
+    group: "{{ rpi_tensorflowlite_user }}"
     mode: "0750"
-  become_user: "{{ tensorflowlite_user }}"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
 
 # Check if the model has already been downloaded and extracted
 - name: Check if model is already extracted
   ansible.builtin.stat:
-    path: "{{ tensorflowlite_model_dir }}/detect.tflite"
+    path: "{{ rpi_tensorflowlite_model_dir }}/detect.tflite"
   register: model_exists
 
 - name: Download pre-trained model (SSD MobileNet v2) if not already downloaded
   ansible.builtin.get_url:
-    url: "{{ tensorflowlite_model_url }}"
-    dest: "{{ tensorflowlite_model_dir }}/model.zip"
+    url: "{{ rpi_tensorflowlite_model_url }}"
+    dest: "{{ rpi_tensorflowlite_model_dir }}/model.zip"
     mode: "0644"
-  become_user: "{{ tensorflowlite_user }}"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   when: not model_exists.stat.exists
 
 - name: Extract pre-trained model if not already extracted
   ansible.builtin.unarchive:
-    src: "{{ tensorflowlite_model_dir }}/model.zip"
-    dest: "{{ tensorflowlite_model_dir }}"
+    src: "{{ rpi_tensorflowlite_model_dir }}/model.zip"
+    dest: "{{ rpi_tensorflowlite_model_dir }}"
     remote_src: true
-    creates: "{{ tensorflowlite_model_dir }}/detect.tflite"
-  become_user: "{{ tensorflowlite_user }}"
+    creates: "{{ rpi_tensorflowlite_model_dir }}/detect.tflite"
+  become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   when: not model_exists.stat.exists
