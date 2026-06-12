@@ -1,6 +1,15 @@
 ---
 # Based on https://www.tensorflow.org/lite/guide/build_rpi with updated sources
 
+- name: Gather tensorflowlite user infos
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ rpi_tensorflowlite_user }}"
+
+- name: Lookup home for tensorflowlite user
+  ansible.builtin.set_fact:
+    rpi_tensorflowlite_user_home: "{{ ansible_facts.getent_passwd[rpi_tensorflowlite_user][4] }}"
+
 - name: Ensure build-essential and dependencies
   ansible.builtin.package:
     name:

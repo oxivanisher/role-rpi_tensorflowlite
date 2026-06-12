@@ -1,6 +1,6 @@
 ---
 rpi_tensorflowlite_user: pi
-rpi_tensorflowlite_dir: "/home/{{ rpi_tensorflowlite_user }}/tensorflow/tensorflow_src"
+rpi_tensorflowlite_dir: "{{ rpi_tensorflowlite_user_home }}/tensorflow/tensorflow_src"
 rpi_tensorflowlite_version: master
 rpi_tensorflowlite_model_url: https://storage.googleapis.com/download.tensorflow.org/models/tflite/coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.zip
-rpi_tensorflowlite_model_dir: "/home/{{ rpi_tensorflowlite_user }}/tensorflow/model"
+rpi_tensorflowlite_model_dir: "{{ rpi_tensorflowlite_user_home }}/tensorflow/model"
