@@ -31,7 +31,7 @@
     depth: 1
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
-  register: git_state
+  register: rpi_tensorflowlite_git_state
 
 - name: Download TensorFlow Lite dependencies
   ansible.builtin.command: "./tensorflow/lite/tools/make/download_dependencies.sh"
@@ -40,7 +40,7 @@
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   changed_when: true
-  when: git_state.after != git_state.before
+  when: rpi_tensorflowlite_git_state.after != rpi_tensorflowlite_git_state.before
 
 - name: Compile TensorFlow Lite
   ansible.builtin.command: "./tensorflow/lite/tools/make/build_rpi_lib.sh"
@@ -49,7 +49,7 @@
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
   changed_when: true
-  when: git_state.after != git_state.before
+  when: rpi_tensorflowlite_git_state.after != rpi_tensorflowlite_git_state.before
 
 - name: Ensure model directory exists
   ansible.builtin.file:
@@ -67,7 +67,7 @@
     path: "{{ rpi_tensorflowlite_model_dir }}/detect.tflite"
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
-  register: model_exists
+  register: rpi_tensorflowlite_model_exists
 
 - name: Download pre-trained model (SSD MobileNet v2) if not already downloaded
   ansible.builtin.get_url:
@@ -76,7 +76,7 @@
     mode: "0644"
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
-  when: not model_exists.stat.exists
+  when: not rpi_tensorflowlite_model_exists.stat.exists
 
 - name: Extract pre-trained model if not already extracted
   ansible.builtin.unarchive:
@@ -86,4 +86,4 @@
     creates: "{{ rpi_tensorflowlite_model_dir }}/detect.tflite"
   become_user: "{{ rpi_tensorflowlite_user }}"
   become: true
-  when: not model_exists.stat.exists
+  when: not rpi_tensorflowlite_model_exists.stat.exists
